@@ -1,0 +1,8 @@
+{
+  "name": "Mirror AI - Therapy Assistant",
+  "description": "A dual-mode therapy platform featuring real-time video sessions, AI-powered emotional analysis using Gemini 1.5 Flash, and comprehensive session management for both patients and therapists.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
