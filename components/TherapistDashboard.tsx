@@ -13,16 +13,23 @@ interface Props {
   onAddPatient: (patient: Patient) => void;
   onSessionCreated: (session: Session) => void;
   onViewSession: (session: Session) => void;
+  activeTab?: 'patients' | 'schedule' | 'sessions';
+  setActiveTab?: (tab: 'patients' | 'schedule' | 'sessions') => void;
 }
 
 export const TherapistDashboard: React.FC<Props> = ({ 
     onStartSession, patients, appointments, sessions, 
-    onViewPatient, onAddPatient, onSessionCreated, onViewSession 
+    onViewPatient, onAddPatient, onSessionCreated, onViewSession,
+    activeTab: propActiveTab, setActiveTab: propSetActiveTab
 }) => {
-  const [activeTab, setActiveTab] = useState<'patients' | 'schedule' | 'sessions'>('schedule');
+  const [internalActiveTab, setInternalActiveTab] = useState<'patients' | 'schedule' | 'sessions'>('schedule');
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
   
+  // Use prop controlled state if available, else internal state
+  const activeTab = propActiveTab || internalActiveTab;
+  const setActiveTab = propSetActiveTab || setInternalActiveTab;
+
   // Add Patient State
   const [newPatientName, setNewPatientName] = useState('');
   const [newPatientEmail, setNewPatientEmail] = useState('');
@@ -239,7 +246,14 @@ export const TherapistDashboard: React.FC<Props> = ({
                         {sessions.map(session => (
                             <div key={session.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col">
                                 <div className="h-32 bg-gray-100 flex items-center justify-center relative group cursor-pointer" onClick={() => onViewSession(session)}>
-                                    <PlayCircle size={48} className="text-gray-400 group-hover:text-brand-600 transition-colors" />
+                                    {session.videoUrl ? (
+                                        <video src={session.videoUrl} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gray-200" />
+                                    )}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+                                        <PlayCircle size={48} className="text-white drop-shadow-lg" />
+                                    </div>
                                     <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">Recorded</div>
                                 </div>
                                 <div className="p-4 flex-1 flex flex-col">

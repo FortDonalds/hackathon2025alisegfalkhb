@@ -45,6 +45,9 @@ function App() {
   const [patientProfileName, setPatientProfileName] = useState('Sarah Miller');
   const [patientProfileNickname, setPatientProfileNickname] = useState('Sarah');
 
+  // Therapist Dashboard Active Tab (lifted to allow navigation after recording)
+  const [therapistActiveTab, setTherapistActiveTab] = useState<'patients' | 'schedule' | 'sessions'>('schedule');
+
   const toggleRole = (newRole: UserRole) => {
     setRole(newRole);
     setCurrentView('dashboard');
@@ -60,9 +63,27 @@ function App() {
     setCurrentView('dashboard');
   };
 
-  const handleAnalysisComplete = (result: AnalysisResult) => {
-    setCurrentView('analysis');
-    setAnalysisResult(result);
+  const handleAnalysisComplete = (result: AnalysisResult, videoBlob: Blob) => {
+    // Create a new session record automatically
+    const newSession: Session = {
+        id: Date.now().toString(),
+        patientId: '1', // Default to Sarah for this demo
+        patientName: 'Sarah Miller',
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'}),
+        title: 'Live Video Session',
+        videoBlob: videoBlob,
+        videoUrl: URL.createObjectURL(videoBlob),
+        analysis: result,
+        counselorNotes: '',
+        studentNotes: ''
+    };
+
+    setSessions([newSession, ...sessions]);
+    
+    // Switch view to Therapist Session List so they can see it
+    setRole(UserRole.THERAPIST); // Ensure we are in therapist view to see the result
+    setTherapistActiveTab('sessions');
+    setCurrentView('dashboard');
   };
 
   // --- Patient Actions ---
@@ -207,6 +228,8 @@ function App() {
                     onAddPatient={handleAddPatient}
                     onSessionCreated={handleSessionCreated}
                     onViewSession={handleViewSession}
+                    activeTab={therapistActiveTab} 
+                    setActiveTab={setTherapistActiveTab}
                 />
             )
         ) : (

@@ -48,6 +48,7 @@ export interface Session {
   date: string;
   title: string;
   videoUrl?: string; // Blob URL or file path
+  videoBlob?: Blob; // The raw file object
   analysis: AnalysisResult;
   counselorNotes: string;
   studentNotes: string; // Notes visible to student
